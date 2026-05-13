@@ -12,4 +12,4 @@ public interface StockRepo extends JpaRepository<Stock, Long> {
 
     Stock findBySymbol(String symbol);
         List<Stock> findAllBySector(String sector);
-    }
+}

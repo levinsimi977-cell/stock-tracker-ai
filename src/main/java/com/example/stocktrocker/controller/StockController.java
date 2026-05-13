@@ -2,6 +2,7 @@ package com.example.stocktrocker.controller;
 
 import com.example.stocktrocker.entities.Stock;
 import com.example.stocktrocker.service.StockService;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,15 +34,43 @@ public class StockController {
             return ResponseEntity.badRequest().body("שגיאה בהוספת המניה: " + e.getMessage());
         }
     }
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/addAmountStock")
-    public ResponseEntity<String> addAmountStock(@RequestParam Long id, @RequestParam int amount) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateStock(
+            @PathVariable Long id,
+            @RequestBody Stock updatedStock) {
+
         try {
-            // שימי לב לסדר הפרמטרים ב-Service: (amount, id)
+
+            System.out.println("========== UPDATE ==========");
+            System.out.println(updatedStock);
+
+            Stock updated = stockService.updateStock(id, updatedStock);
+
+            return ResponseEntity.ok(updated);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity.internalServerError()
+                    .body(Map.of(
+                            "message", e.getMessage(),
+                            "exception", e.getClass().getSimpleName()
+                    ));
+        }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/addAmountStock") // נתיב פשוט בלי לוכסנים בסוף
+    public ResponseEntity<String> addAmountStock(@RequestBody Map<String, Object> payload) {
+        try {
+            // שליפת הנתונים מתוך ה-Body ששלחנו מה-React
+            Long id = Long.valueOf(payload.get("id").toString());
+            int amount = Integer.parseInt(payload.get("amount").toString());
+
             stockService.addAmountStock(amount, id);
             return ResponseEntity.ok("כמות המניה עודכנה בהצלחה!");
         } catch (Exception e) {
-            return ResponseEntity.status(404).body("מניה לא נמצאה");
+            return ResponseEntity.status(400).body("שגיאה בנתונים: " + e.getMessage());
         }
     }
     @PreAuthorize("hasRole('ADMIN')")
@@ -59,9 +88,14 @@ public class StockController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping
     public List<Stock> getAllStocks() {
-        return stockService.getAllStocks();
-    }
+        try {
 
+            return stockService.getAllStocks();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/{symbol}")
     public ResponseEntity<Stock> getStockBySymbol(@PathVariable String symbol) {
@@ -81,7 +115,6 @@ public class StockController {
 
         return ResponseEntity.ok("--- ניתוח סקטור: " + sector + " ---\n" + summary);
     }
-
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/ai/analysis/{id}")
     public ResponseEntity<?> getFullAnalysis(@PathVariable Long id) {

@@ -1,12 +1,12 @@
 package com.example.stocktrocker.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @ToString
 @EqualsAndHashCode
 @Table(name = "stock_ownerships")
@@ -23,8 +23,9 @@ public class StockOwnership {//החזקה במניות באותה חברה
 
         @ManyToOne
         @JoinColumn(name = "user_id")
-        private User user;
+        @JsonIgnore
 
+        private User user;
         @ManyToOne
         @JoinColumn(name = "stock_id")
         private Stock stock;

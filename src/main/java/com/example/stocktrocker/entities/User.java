@@ -1,5 +1,6 @@
 package com.example.stocktrocker.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,11 +15,10 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @ToString
 @EqualsAndHashCode
 
-@Table(name = "users")  // שינוי שם הטבלה מ-user ל-users
+@Table(name = "users")
 
 public class User {
     public enum Role {
@@ -38,6 +38,8 @@ private Role role;
 
     private Double balance; // יתרה כספית לקנייה
 private double valueStock;//ערך כלל המניות שברשותו
+    @JsonIgnore
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<StockOwnership> holdings; // רשימת המניות שבבעלותו
 

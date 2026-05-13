@@ -25,6 +25,28 @@ public class UserService {
 
     @Autowired private JavaMailSender mailSender;
 
+    @Transactional
+    public Double depositMoney(Long userId, Double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("סכום ההפקדה חייב להיות חיובי");
+        }
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("משתמש לא נמצא"));
+
+        // עדכון היתרה
+        userRepo.updateBalance(userId, amount);
+
+        // החזרת היתרה החדשה כדי שה-Frontend יוכל להתעדכן מיד
+        return user.getBalance() + amount;
+    }
+    public Double getBalance(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("משתמש לא נמצא"));
+        return user.getBalance();
+    }
+
+
     public User addUser(User user) {
         if (userRepo.existsByEmail(user.getEmail())) {
             throw new RuntimeException("שגיאה: האימייל כבר קיים!");
@@ -32,7 +54,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setBalance(10000.0);
         user.setValueStock(0.0);
-
+user.setRole(User.Role.USER);
         User savedUser = userRepo.save(user);
 
         // שליחת מייל לאחר שמירת המשתמש בהצלחה
@@ -70,7 +92,6 @@ public class UserService {
     }
     public User login(String email, String password) {
         User u = userRepo.findByEmail(email);
-        // השוואת סיסמה מוצפנת
         if (u == null || !passwordEncoder.matches(password, u.getPassword())) {
             throw new RuntimeException("שגיאה: פרטי התחברות שגויים");
         }

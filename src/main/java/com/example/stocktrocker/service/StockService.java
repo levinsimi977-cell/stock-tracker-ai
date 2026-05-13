@@ -1,8 +1,11 @@
 package com.example.stocktrocker.service;
 
 import com.example.stocktrocker.entities.Stock;
+import com.example.stocktrocker.entities.StockOwnership;
 import com.example.stocktrocker.entities.Transaction;
+import com.example.stocktrocker.entities.User;
 import com.example.stocktrocker.repositories.StockRepo;
+import com.example.stocktrocker.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +22,24 @@ public class StockService {
     private StockRepo stockRepo;
     @Autowired
     private AIService aiService;
-
+    @Autowired
+    private UserRepo userRepo;
+    private final Map<Long, String> aiAdviceCache = new ConcurrentHashMap<>();
 
     public StockService(StockRepo stockRepo) {
         this.stockRepo = stockRepo;
     }
     public String getExternalAIAdvice(Stock stock) {
+        if (aiAdviceCache.containsKey(stock.getId())) {
+            return aiAdviceCache.get(stock.getId());
+        }
         String data = "חברה: " + stock.getCompanyName() +
                 ", מחיר: " + stock.getCurrentPrice() +
                 ", מגמה: " + calculatePriceTrend(stock) +
                 ", דוח: " + stock.getFinancialReport();
-
-        return aiService.summarizeReports(data);
+        String advice = aiService.summarizeReports(data);
+        aiAdviceCache.put(stock.getId(), advice);
+        return advice;
     }
 
     /**
@@ -38,34 +47,43 @@ public class StockService {
      */
     public String getAIAnalysis(Stock stock) {
         try {
-            double changePercent = calculatePriceTrend(stock);
-
-            String priceTrend = "יציב";
-            if (changePercent > 1) priceTrend = "עלייה";
-            else if (changePercent < -1) priceTrend = "ירידה";
-
-            String financialStatus = stock.getFinancialReport().toLowerCase();
-            boolean isProfitable = financialStatus.contains("profit") || financialStatus.contains("צמיחה");
+            // במקום לחשב רק את השינוי האחרון, נשתמש בשיפוע של כל 10 המחירים
+            double slope = runLinearRegression(stock.getMovePrice());
+            double immediateChange = calculatePriceTrend(stock); // השינוי המיידי מהפעולה האחרונה
 
             String recommendation;
             String reasoning;
+            String trendIcon;
 
-            if (priceTrend.equals("עלייה") && isProfitable) {
-                recommendation = "קנייה (Buy)";
-                reasoning = "המניה מציגה מומנטום חיובי של " + String.format("%.2f%%", changePercent) + " בשילוב דוחות חזקים.";
-            } else if (priceTrend.equals("ירידה") || !isProfitable) {
+            // אם השיפוע שלילי - המגמה הכללית היא ירידה
+            if (slope < -0.05) {
                 recommendation = "מכירה (Sell)";
-                reasoning = "זוהתה מגמת החלשות או חוסר יציבות בנתונים הפיננסיים.";
-            } else {
+                trendIcon = "📉";
+                reasoning = "האלגוריתם מזהה מגמת ירידה עקבית ב-10 הדגימות האחרונות. לא מומלץ להחזיק כרגע.";
+            }
+            // אם השיפוע חיובי - המגמה הכללית היא עלייה
+            else if (slope > 0.05) {
+                recommendation = "קנייה (Buy)";
+                trendIcon = "📈";
+                reasoning = "זוהה מומנטום חיובי ועלייה עקבית בערך המניה. פוטנציאל רווח גבוה.";
+            }
+            // אם השיפוע כמעט אפס - השוק באמת יציב
+            else {
                 recommendation = "החזקה (Hold)";
-                reasoning = "השינוי במחיר מינורי (" + String.format("%.2f%%", changePercent) + "); מומלץ להמתין.";
+                trendIcon = "⚖️";
+                reasoning = "המחיר תנודתי אך המגמה הכללית אופקית (יציבה). כדאי להמתין לפריצה.";
             }
 
-            return String.format("ניתוח עבור %s (%s): המלצת %s. %s",
-                    stock.getCompanyName(), stock.getSymbol(), recommendation, reasoning);
+            // מוסיף התייחסות ספציפית אם הייתה ירידה חדה הרגע (כמו שקרה לך עם ה-9000 מניות)
+            if (immediateChange < -5) {
+                reasoning += " שימי לב: הפעולה האחרונה גרמה לירידה חדה של " + String.format("%.2f%%", immediateChange) + ".";
+            }
+
+            return String.format("%s ניתוח %s: המלצת %s. %s",
+                    trendIcon, stock.getSymbol(), recommendation, reasoning);
 
         } catch (Exception e) {
-            return "שגיאה בביצוע ניתוח: " + e.getMessage();
+            return "שגיאה בניתוח הנתונים: " + e.getMessage();
         }
     }
 
@@ -129,12 +147,9 @@ public class StockService {
         double intercept = (sumY - slope * sumX) / n;
         return slope * n + intercept;
     }
-
-
     public void addAStock(Stock stock) {
         stockRepo.save(stock);
     }
-
     public void addAmountStock(int amount, long idStack) {
         stockRepo.findById(idStack).ifPresent(s -> {
             double priceBefore = s.getCurrentPrice();
@@ -148,6 +163,25 @@ public class StockService {
         });
     }
 
+    private void updateAllUsersHoldings(Stock stock) {
+
+        if (stock.getOwnerships() == null) return;
+
+        for (StockOwnership ownership : stock.getOwnerships()) {
+
+            User user = ownership.getUser();
+
+            double totalValue = 0.0;
+
+            for (StockOwnership o : user.getHoldings()) {
+                totalValue += o.getStock().getCurrentPrice() * o.getQuantity();
+            }
+
+            user.setValueStock(totalValue);
+
+            userRepo.save(user);
+        }
+    }
     public void addToValueStock(double value, long idStack) {
         stockRepo.findById(idStack).ifPresent(s -> {
             double priceBefore = s.getCurrentPrice();
@@ -168,7 +202,6 @@ public class StockService {
             }
         }
     }
-
     public List<Stock> getAllStocks() {
         return stockRepo.findAll();
     }
@@ -188,7 +221,57 @@ public class StockService {
             stockRepo.delete(stock);
         });
     }
+    public Stock updateStock(Long id, Stock updatedStock) {
+        Stock existingStock = stockRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Stock not found"));
 
+        // 1. עדכון פרטים בסיסיים
+        if (updatedStock.getCompanyName() != null && !updatedStock.getCompanyName().isBlank()) {
+            existingStock.setCompanyName(updatedStock.getCompanyName());
+        }
+        if (updatedStock.getSector() != null && !updatedStock.getSector().isBlank()) {
+            existingStock.setSector(updatedStock.getSector());
+        }
+        if (updatedStock.getAvailableShares() >= 0) {
+            existingStock.setAvailableShares(updatedStock.getAvailableShares());
+        }
+
+        // 2. טיפול במחיר - זה החלק הקריטי לגרף!
+        if (updatedStock.getCurrentPrice() > 0) {
+            // אנחנו מעדכנים את ההיסטוריה *לפני* השמירה הסופית
+            updatePriceHistory(existingStock, updatedStock.getCurrentPrice());
+        }
+
+        // 3. שמירה אחת ויחידה ב-DB
+        Stock saved = stockRepo.save(existingStock);
+
+        // 4. עדכון ה-Cache כדי שה-AI והגרף יראו את השינוי מיד
+        quickPriceMap.put(saved.getSymbol(), saved.getCurrentPrice());
+
+        // 5. עדכון תיקי המשתמשים
+        updateAllUsersHoldings(saved);
+
+        return saved;
+    }
+
+    private void updatePriceHistory(Stock stock, double newPrice) {
+        if (stock.getMovePrice() == null) {
+            stock.setMovePrice(new ArrayList<>());
+        }
+
+        // הוספה למערך התנודות
+        stock.getMovePrice().add(newPrice);
+
+        // הגבלה ל-10 נתונים אחרונים
+        if (stock.getMovePrice().size() > 10) {
+            stock.getMovePrice().remove(0);
+        }
+
+        // עדכון המחיר הנוכחי באובייקט
+        stock.setCurrentPrice(newPrice);
+
+        // שימי לב: הסרתי מכאן את ה-save! הוא מתבצע בתוך updateStock
+    }
     public Stock findBySymbol(String stockSymbol) {
         return stockRepo.findBySymbol(stockSymbol);
     }
@@ -197,33 +280,18 @@ public class StockService {
         return stockRepo.findAllBySector(sector);
     }
 
-    private void updatePriceHistory(Stock stock, double newPrice) {
 
-
-        if (stock.getMovePrice() == null) {
-            stock.setMovePrice(new ArrayList<>());
-        }
-        stock.getMovePrice().add(stock.getCurrentPrice());
-        if (stock.getMovePrice().size() > 10) {
-            stock.getMovePrice().remove(0);
-        }
-        stock.setCurrentPrice(newPrice);
-        quickPriceMap.put(stock.getSymbol(), newPrice);
-
-    }
     public Double getStockPrice(String symbol) {
-        // בודק אם המחיר כבר קיים במפה.
-        // אם לא, הוא מפעיל את הלוגיקה שבתוך ה-lambda (החץ) כדי להביא מה-DB
+
         return quickPriceMap.computeIfAbsent(symbol, s -> {
             Stock stock = stockRepo.findBySymbol(s);
             if (stock != null) {
                 return stock.getCurrentPrice();
             }
-            return 0.0; // ערך ברירת מחדל אם המניה לא נמצאה
+            return 0.0;
         });
     }
     public void updatePriceInCache(String symbol, Double newPrice) {
-        // עדכון המפה המהירה בזיכרון
         quickPriceMap.put(symbol, newPrice);
     }
 }

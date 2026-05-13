@@ -1,6 +1,7 @@
 package com.example.stocktrocker.controller;
 
 import com.example.stocktrocker.entities.Stock;
+import com.example.stocktrocker.entities.Transaction;
 import com.example.stocktrocker.entities.User;
 import com.example.stocktrocker.service.StockService;
 import com.example.stocktrocker.service.TransactionService;
@@ -23,7 +24,6 @@ public class TransactionController {
     public ResponseEntity<String> buy( @RequestParam String symbol, @RequestParam int amount) {
         String currentUserEmail = (String) org.springframework.security.core.context.SecurityContextHolder
                 .getContext().getAuthentication().getPrincipal();
-
         User user = userService.getUserByEmail(currentUserEmail);
         Stock stock = stockService.findBySymbol(symbol);
         transactionService.buyStock(user, stock, amount);
@@ -37,5 +37,9 @@ public class TransactionController {
         Stock stock = stockService.findBySymbol(symbol);
         transactionService.sellStock(user, stock, amount);
         return ResponseEntity.ok("Transaction completed: SELL " + amount + " " + symbol);
+    }
+    @GetMapping("/today")
+    public ResponseEntity<List<Transaction>> getTodayTransactions() {
+        return ResponseEntity.ok(transactionService.getTodayTransactions());
     }
 }

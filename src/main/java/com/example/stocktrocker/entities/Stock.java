@@ -7,9 +7,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
-@Data
 @ToString
 @EqualsAndHashCode
 @Entity
@@ -41,8 +40,14 @@ public class Stock {
     @CollectionTable(name = "movePrice", joinColumns = @JoinColumn(name = "stock_id"))
     @Column(name = "price")
     private List<Double> movePrice = new ArrayList<>();
+
+    @JsonIgnore
     @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
     private List<Transaction> userTransaction; // רשימת המניות שבבעלותו
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
+    private List<StockOwnership> ownerships;
 }
 
 

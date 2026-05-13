@@ -38,14 +38,12 @@ public class AIService {
                 "role", "user",
                 "content", instruction
         );
-
         Map<String, Object> requestBody = Map.of(
                 "model", "Qwen/Qwen2.5-72B-Instruct",
                 "messages", List.of(message),
                 "max_tokens", 500,
                 "temperature", 0.2
         );
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

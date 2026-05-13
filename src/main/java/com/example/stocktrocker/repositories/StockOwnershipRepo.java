@@ -12,7 +12,10 @@ public interface StockOwnershipRepo extends JpaRepository<StockOwnership, Long> 
         StockOwnership findByUserIdAndStockId(Long userId, Long stockId);
         // תיקון למציאת בעלות לפי טרנזקציה (נדרש ב-Service שלך)
         default StockOwnership findByTransaction(Transaction t) {
+            if (t == null || t.getUser() == null || t.getStock() == null) {
+                return null;
+            }
             return findByUserIdAndStockId(t.getUser().getId(), t.getStock().getId());
         }
-
+        List<StockOwnership> findByUserId(Long userId);
 }

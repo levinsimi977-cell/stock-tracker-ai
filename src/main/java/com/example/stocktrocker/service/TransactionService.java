@@ -7,6 +7,7 @@ import com.example.stocktrocker.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -59,7 +60,12 @@ public class TransactionService {
 
         stockOwnershipService.addStockOwnership(user, stock, amount);
     }
+    public List<Transaction> getTodayTransactions() {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
 
+        return transactionRepo.findByTimestampBetween(startOfDay, endOfDay);
+    }
     public void sellStock(User user, Stock stock, int amount) {
 
         if (amount <= 0) throw new RuntimeException("כמות לא תקינה");
