@@ -34,18 +34,18 @@ Navigate to the backend/ folder.
 Run the application:
 
 Bash
-./mvnw spring-boot:run
+   ./mvnw spring-boot:run
 Frontend Setup
 Navigate to the frontend/ folder.
 
 Install dependencies:
 
 Bash
-npm install
+   npm install
 Start the development server:
 
 Bash
-npm run dev
+   npm run dev
 🔮 Future Roadmap & Enhancements
 I am constantly working on improving StockTracker AI. Here are the upcoming features I plan to implement:
 
@@ -59,6 +59,3 @@ Advanced AI Forecasting: Expanding the AI module to provide predictive analytics
 
 📜 License
 This project is open-source and available for educational purposes.
-stock-tracker-ai/
-├── backend/      # Spring Boot application
-└── frontend/     # React & Vite application
