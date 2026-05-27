@@ -1,0 +1,137 @@
+package com.example.stocktrocker.service;
+
+import com.example.stocktrocker.entities.*;
+import com.example.stocktrocker.repositories.*;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+@Service
+@Transactional // מבטיח שכל פעולה כספית היא "הכל או כלום"
+public class UserService {
+
+    @Autowired private UserRepo userRepo;
+    @Autowired private StockRepo stockRepo;
+    @Autowired private TransactionRepo transactionRepo;
+    @Autowired private StockOwnershipRepo stockOwnershipRepo;
+    @Autowired private PasswordEncoder passwordEncoder;
+
+    @Autowired private JavaMailSender mailSender;
+
+    @Transactional
+    public Double depositMoney(Long userId, Double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("סכום ההפקדה חייב להיות חיובי");
+        }
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("משתמש לא נמצא"));
+
+        // עדכון היתרה
+        userRepo.updateBalance(userId, amount);
+
+        // החזרת היתרה החדשה כדי שה-Frontend יוכל להתעדכן מיד
+        return user.getBalance() + amount;
+    }
+
+    public Double withdrawMoney(Long userId, Double amount) {
+        // 1. שליפת המשתמש מהדאטהבייס, אם הוא לא קיים נזרק חריגה
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("משתמש לא נמצא"));
+
+        // 2. בדיקה ביטחונית: האם יש לו מספיק כסף למשיכה?
+        if (user.getBalance() < amount) {
+            throw new IllegalArgumentException("אין מספיק כסף בחשבון לביצוע המשיכה. היתרה שלך היא: $" + user.getBalance());
+        }
+
+        // 3. עדכון היתרה החדשה (חיסור)
+        user.setBalance(user.getBalance() - amount);
+
+        // 4. שמירה של המצב החדש בדאטהבייס
+        userRepo.save(user);
+
+        // 5. החזרת היתרה המעודכנת לקונטרולר
+        return user.getBalance();
+    }
+    public Double getBalance(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("משתמש לא נמצא"));
+        return user.getBalance();
+    }
+
+
+    public User addUser(User user) {
+        if (userRepo.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("שגיאה: האימייל כבר קיים!");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setBalance(0.0);
+        user.setValueStock(0.0);
+user.setRole(User.Role.USER);
+        User savedUser = userRepo.save(user);
+
+        // שליחת מייל לאחר שמירת המשתמש בהצלחה
+        sendWelcomeEmail(savedUser.getEmail(), savedUser.getUsername());
+
+        return savedUser;
+    }
+
+    private void sendWelcomeEmail(String toEmail, String firstName) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            // true מציין שאנחנו רוצים הודעת Multi-part (תומך בעברית וקבצים)
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("stocktrocker@gmail.com");
+            helper.setTo(toEmail);
+            helper.setSubject("ברוך הבא ל-StockTrocker!");
+
+            String content = "<html><body>" +
+                    "<h3>שלום " + firstName + ",</h3>" +
+                    "<p>שמחים שהצטרפת למערכת ניהול המניות שלנו.</p>" +
+                    "<p>ברכות</p>" +
+                    "<p>בהצלחה בהשקעות!</p>" +
+                    "</body></html>";
+
+            helper.setText(content, true); // true אומר שזה תוכן HTML
+
+            mailSender.send(message);
+            System.out.println("המייל נשלח בהצלחה ל-" + toEmail);
+
+        } catch (Exception e) {
+            System.err.println("נכשלה שליחת מייל ל-" + toEmail + ": " + e.getMessage());
+            e.printStackTrace(); // זה ידפיס לנו את כל ה-Stack Trace במידה ויש שגיאה
+        }
+    }
+    public User login(String email, String password) {
+        User u = userRepo.findByEmail(email);
+        if (u == null || !passwordEncoder.matches(password, u.getPassword())) {
+            throw new RuntimeException("שגיאה: פרטי התחברות שגויים");
+        }
+        return u;
+    }
+    public User getUserByEmail(String email) {
+        User u = userRepo.findByEmail(email);
+        if (u == null) throw new RuntimeException("משתמש לא נמצא");
+        return u;
+    }
+    public User updateUser(String email, User updatedUser) {
+        User existingUser = getUserByEmail(email);
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setPassword(updatedUser.getPassword());
+        existingUser.setEmail(updatedUser.getEmail());
+        return userRepo.save(existingUser);
+    }
+
+
+    public void deleteUser(Long userId) {
+        userRepo.deleteById(userId);
+    }
+}
