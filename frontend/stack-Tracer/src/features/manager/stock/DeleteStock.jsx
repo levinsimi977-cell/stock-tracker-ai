@@ -10,11 +10,9 @@ const DeleteStock = () => {
   const { data: stocks, error, isLoading } = useGetAllStockQuery();
   const [deleteStock] = useDeleteStockMutation();
 
-  // סטייט לניהול הפופ-אפים והאישורים
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'success', message: '' });
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, stockId: null, stockName: null });
 
-  // פונקציה ראשונית לפתיחת מודאל האישור המעוצב
   const triggerDeleteConfirm = (stockId, stockName) => {
     setConfirmConfig({
       isOpen: true,
@@ -23,7 +21,6 @@ const DeleteStock = () => {
     });
   };
 
-  // ביצוע המחיקה בפועל מתוך המודאל
   const handleExecuteDelete = async () => {
     const { stockId, stockName } = confirmConfig;
     setConfirmConfig({ isOpen: false, stockId: null, stockName: null }); // סגירת מודאל האישור בבטחה
@@ -31,27 +28,20 @@ const DeleteStock = () => {
     try {
       await deleteStock(stockId).unwrap();
       
-      // הודעת הצלחה מפוצצת בקו האחיד של האתר
       setModalConfig({
         isOpen: true,
         type: 'success',
         message: `המניה ${stockName} נמחקה לצמיתות מהמסחר הגלובלי! מערכת ה-Java הפעילה זיכוי כספי מלא לכל בעלי המניות.`
       });
     } catch (err) {
-      console.error('שגיאה במחיקת המניה:', err);
-      // הודעת שגיאה באדום ניאון
-      setModalConfig({
-        isOpen: true,
-        type: 'error',
-        message: err.data || 'פעולת הגריעה נכשלה. לא ניתן למחוק את הנכס או לזכות את המשתמשים כעת.'
-      });
+     
     }
   };
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === 'success') {
-      navigate('/manager'); // מעבירים לדשבורד רק אחרי מחיקה מוצלחת
+      navigate('/manager');
     }
   };
 
@@ -72,7 +62,6 @@ const DeleteStock = () => {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 relative min-h-[85vh]" dir="rtl">
       
-      {/* כותרת הדף והסבר */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800/60 pb-6 gap-4">
         <div>
           <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
@@ -128,7 +117,6 @@ const DeleteStock = () => {
         </div>
       </div>
 
-      {/* 🚨 מודאל 1: אישור מחיקה חסוי פסיכי ומנקר עיניים (במקום ה-window.confirm) */}
       <AnimatePresence>
         {confirmConfig.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
@@ -169,7 +157,6 @@ const DeleteStock = () => {
         )}
       </AnimatePresence>
 
-      {/* 🌟 מודאל 2: מודאל תוצאה מהפנט - הקו האחיד של האתר (הצלחה/כישלון) */}
       <AnimatePresence>
         {modalConfig.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">

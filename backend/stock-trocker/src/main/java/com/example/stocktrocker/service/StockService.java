@@ -30,6 +30,7 @@ public class StockService {
     public StockService(StockRepo stockRepo) {
         this.stockRepo = stockRepo;
     }
+    // מבקש המלצה מבינה מלאכותית
     public String getExternalAIAdvice(Stock stock) {
 
 
@@ -219,20 +220,20 @@ public class StockService {
 
         prices.add(newPrice);
     }
-
+    // מחזיר את המניות המובילות
     public List<Stock> getTopStocks() {
         return stockRepo.findAll().stream()
                 .sorted((a, b) -> Double.compare(score(b), score(a)))
                 .limit(5)
                 .toList();
     }
-
+    // מחשב ציון ביצועי מניה
     private double score(Stock s) {
         double trend = calculatePriceTrend(s);
         double avg = s.getMovePrice().stream().mapToDouble(Double::doubleValue).average().orElse(0);
         return trend + (s.getCurrentPrice() - avg);
     }
-
+    // מחזיר מניות במומנטום חיובי
     public List<Stock> getMomentumStocks() {
         return stockRepo.findAll().stream()
                 .filter(s -> s.getMovePrice() != null && s.getMovePrice().size() >= 5)
@@ -242,7 +243,7 @@ public class StockService {
                 })
                 .collect(Collectors.toList());
     }
-
+    // חוזה מחיר מניה עתידי
     public double predictFutureValue(long stockId) {
         Stock s = stockRepo.findById(stockId).orElse(null);
         if (s == null || s.getMovePrice() == null || s.getMovePrice().isEmpty()) {
@@ -254,7 +255,7 @@ public class StockService {
         // אם התחזית יצאה שלילית, נחזיר 0.01 (מחיר מינימלי)
         return Math.max(0.01, predictedPrice);
     }
-
+    // מחשב אחוז שינוי מחיר
     private double calculatePriceTrend(Stock s) {
 
         if (s.getMovePrice() == null ||
@@ -277,7 +278,7 @@ public class StockService {
 
         return ((current - last) / last) * 100;
     }
-
+    // מבצע רגרסיה ליניארית לחיזוי
     private double runLinearRegression(List<Double> prices) {
 
         if (prices == null || prices.isEmpty()) {
@@ -338,12 +339,10 @@ public class StockService {
                 (sumWY - slope * sumWX)
                         / sumW;
 
-        // ======== כאן התיקון =========
         int futureDays = 30;
 
         double prediction =
                 slope * (n + futureDays) + intercept;
-        // ============================
 
         double currentPrice =
                 smoothedPrices.get(n - 1);
@@ -362,6 +361,7 @@ public class StockService {
 
         return Math.max(0.01, prediction);
     }
+    // מחשב שיפוע מגמת מחיר
     private double calculateSlope(List<Double> prices) {
 
         if (prices == null || prices.size() < 2) {
@@ -396,6 +396,7 @@ public class StockService {
         return (n * sumXY - sumX * sumY)
                 / denominator;
     }
+    // מחשב ממוצע נע מעריכי
     private List<Double> calculateEMA(List<Double> prices, double alpha) {
 
         List<Double> ema = new ArrayList<>();
@@ -484,6 +485,7 @@ public class StockService {
             updateAllUsersHoldings(s);
         });
     }
+    // מעדכן תיקי השקעות משתמשים
     private void updateAllUsersHoldings(Stock stock) {
 
         if (stock.getOwnerships() == null) return;
@@ -503,6 +505,7 @@ public class StockService {
             userRepo.save(user);
         }
     }
+    // מעדכן שווי חברה כולל
     public void addToValueStock(double value, long idStack) {
         stockRepo.findById(idStack).ifPresent(s -> {
             double priceBefore = s.getCurrentPrice();
@@ -514,7 +517,7 @@ public class StockService {
             stockRepo.save(s);
         });
     }
-
+    // מסנכרן ערכי החזקות משתמש
     private void updateUserValues(Stock s, double priceBefore, double newPrice) {
         if (s.getUserTransaction() != null) {
             for (Transaction us : s.getUserTransaction()) {
@@ -572,7 +575,6 @@ public class StockService {
         // 4. עדכון ה-Cache כדי שה-AI והגרף יראו את השינוי מיד
         quickPriceMap.put(saved.getSymbol(), saved.getCurrentPrice());
 
-        // 5. עדכון תיקי המשתמשים
         updateAllUsersHoldings(saved);
 
         return saved;
@@ -583,18 +585,9 @@ public class StockService {
             stock.setMovePrice(new ArrayList<>());
         }
 
-        // הוספה למערך התנודות
         stock.getMovePrice().add(newPrice);
-
-//        // הגבלה ל-10 נתונים אחרונים
-//        if (stock.getMovePrice().size() > 10) {
-//            stock.getMovePrice().remove(0);
-//        }
-
-        // עדכון המחיר הנוכחי באובייקט
         stock.setCurrentPrice(newPrice);
 
-        // שימי לב: הסרתי מכאן את ה-save! הוא מתבצע בתוך updateStock
     }
     public Stock findBySymbol(String stockSymbol) {
         return stockRepo.findBySymbol(stockSymbol);

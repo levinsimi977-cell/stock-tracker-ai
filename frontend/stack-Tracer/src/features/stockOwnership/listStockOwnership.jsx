@@ -3,7 +3,7 @@ import { useGetMyPortfolioQuery } from './stockOwnershipApi';
 import { useNavigate } from 'react-router-dom';
 import StockOwnership from './StockOwnership';
 import { Briefcase, Loader2 } from 'lucide-react';
-import AdminPageLayout from '../manager/AdminPageLayout'; // בהנחה שאתה משתמש ב-Layout האחיד
+import AdminPageLayout from '../manager/AdminPageLayout';
 
 const ListStockOwnership = () => {
     const { data: portfolio, isLoading } = useGetMyPortfolioQuery();
@@ -25,9 +25,7 @@ const ListStockOwnership = () => {
     return (
         <div className="bg-[#07080b] min-h-screen text-slate-200">
             <AdminPageLayout title="התיק האישי שלי" subtitle="ניהול נכסים וניתוח AI" icon={Briefcase} className="bg-[#07080b]">
-                {/* מעטפת פנימית שחורה מוחלטת כדי לוודא שום רקע בהיר לא חומק */}
                 <div className="bg-[#07080b] p-6 min-h-screen">
-                    {/* סטטיסטיקה מהירה */}
                     <div className="max-w-4xl mx-auto mb-8 flex justify-end">
                         <div className="bg-[#0d0e12] px-6 py-3 rounded-full border border-slate-800/60 flex items-center gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
                             <span className="text-slate-500 font-bold text-xs uppercase tracking-widest">נכסים בתיק:</span>
@@ -35,14 +33,12 @@ const ListStockOwnership = () => {
                         </div>
                     </div>
 
-                    {/* רשימת מניות */}
                     <div className="grid gap-4 max-w-4xl mx-auto">
                         {portfolio?.map((item) => (
                             <StockOwnership key={item.id} item={item} navigate={navigate} />
                         ))}
                     </div>
 
-                    {/* מצב ריק */}
                     {portfolio?.length === 0 && (
                         <div className="text-center mt-20 text-slate-400 border border-dashed border-slate-800 rounded-[2.5rem] bg-[#0d0e12] p-16 max-w-4xl mx-auto shadow-[0_15px_50px_rgba(0,0,0,0.4)]">
                             <p className="text-xl font-black text-white">התיק עדיין ריק... הגיע הזמן להשקיע! 🚀</p>

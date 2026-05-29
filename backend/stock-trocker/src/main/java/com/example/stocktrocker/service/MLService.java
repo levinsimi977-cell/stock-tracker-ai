@@ -26,10 +26,12 @@ public class MLService {
     }
 
     public List<Double> getTrainData(List<Double> data) {
+
         return data.subList(0, (int)(data.size() * 0.8));
     }
 
     public List<Double> getTestData(List<Double> data) {
+
         return data.subList((int)(data.size() * 0.8), data.size());
     }
 }

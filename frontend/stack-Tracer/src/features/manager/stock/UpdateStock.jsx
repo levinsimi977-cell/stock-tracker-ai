@@ -10,7 +10,6 @@ const UpdateStock = () => {
   const [selectedStock, setSelectedStock] = useState(null);
   const [form, setForm] = useState({ currentPrice: '', availableShares: '', sector: '' });
 
-  // 🌟 סטייט למערכת ההודעות המהפנטת החדשה
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'success', message: '' });
 
   const handleSelect = (e) => {
@@ -31,19 +30,13 @@ const UpdateStock = () => {
     try {
       await updateStock({ id: selectedStock.id, ...form }).unwrap();
       
-      // הודעת הצלחה דרמטית בקו האחיד של האתר
       setModalConfig({
         isOpen: true,
         type: 'success',
         message: `נתוני המניה ${selectedStock.symbol} עודכנו בהצלחה! השינויים סונכרנו מול מסדי הנתונים בשרת בזמן אמת.`
       });
     } catch (err) {
-      // הודעת שגיאה תואמת
-      setModalConfig({
-        isOpen: true,
-        type: 'error',
-        message: err.data || 'עדכון נתוני השוק נכשל. בדקי את תקינות השדות ונתוני התקשורת מול ה-API.'
-      });
+     
     }
   };
 
@@ -51,7 +44,6 @@ const UpdateStock = () => {
     <AdminPageLayout title="עריכת נכסים" subtitle="Update Market Information" icon={Settings2}>
       <div className="max-w-2xl mx-auto bg-[#0d111c]/60 backdrop-blur-xl rounded-[2.5rem] p-10 shadow-[0_40px_100px_rgba(0,0,0,0.6)] border border-slate-800/60 relative overflow-hidden">
         
-        {/* תאורה אחורית סגולה-אינדיגו יוקרתית */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/[0.05] rounded-full blur-[100px] pointer-events-none animate-pulse" />
 
         <div className="relative z-10">
@@ -131,7 +123,6 @@ const UpdateStock = () => {
         </div>
       </div>
 
-      {/* 🌟 המודאל המהפנט: הקו העיצובי האחיד והיוקרתי של האפליקציה */}
       <AnimatePresence>
         {modalConfig.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
@@ -144,7 +135,6 @@ const UpdateStock = () => {
                 modalConfig.type === 'success' ? 'border-emerald-500/40' : 'border-rose-500/40'
               }`}
             >
-              {/* כפתור סגירה מהיר */}
               <button 
                 onClick={() => setModalConfig({ ...modalConfig, isOpen: false })} 
                 className="absolute top-5 left-5 text-slate-500 hover:text-white transition-colors"

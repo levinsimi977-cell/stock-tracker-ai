@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useGetAllUserQuery, useUpDateUserMutation, useDeleteUserMutation } from './userApi';
 
 const Users = () => {
-    // שליפת נתונים - RTK Query מטפל במצב טעינה ושגיאות באופן אוטומטי
     const { data: users, isLoading, isError, error } = useGetAllUserQuery();
     const [updateUser] = useUpDateUserMutation();
     const [deleteUser] = useDeleteUserMutation();
@@ -24,7 +23,6 @@ const Users = () => {
             setEditMode(null);
             alert("המשתמש עודכן בהצלחה");
         } catch (err) {
-            alert("עדכון נכשל: " + err.data?.message);
         }
     };
 
@@ -34,7 +32,6 @@ const Users = () => {
                 await deleteUser(id).unwrap();
                 alert("משתמש נמחק");
             } catch (err) {
-                alert("מחיקה נכשלה");
             }
         }
     };

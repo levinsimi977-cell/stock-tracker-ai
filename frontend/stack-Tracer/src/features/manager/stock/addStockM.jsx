@@ -9,7 +9,6 @@ const AddStockM = () => {
   const [addStock, { isLoading }] = useAddStockMutation();
   const [formData, setFormData] = useState({ symbol: '', companyName: '', sector: 'טכנולוגיה', currentPrice: '', availableShares: '' });
 
-  // 🌟 סטייט למערכת ההודעות המהפנטת החדשה
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'success', message: '' });
 
   const handleSubmit = async (e) => {
@@ -17,27 +16,20 @@ const AddStockM = () => {
     try {
       await addStock(formData).unwrap();
       
-      // הקפצת הודעת ההצלחה הדרמטית
       setModalConfig({
         isOpen: true,
         type: 'success',
         message: `נייר הערך ${formData.symbol.toUpperCase()} הונפק בהצלחה ונוסף למסד הנתונים הגלובלי של הבורסה!`
       });
     } catch (err) {
-      console.error(err);
-      // הקפצת הודעת שגיאה באדום ניאון מהפנט
-      setModalConfig({
-        isOpen: true,
-        type: 'error',
-        message: err.data || 'הנפקת המניה נכשלה. ודאי כי הסימול הבורסאי ייחודי ואינו קיים כבר במערכת.'
-      });
+     
     }
   };
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === 'success') {
-      navigate('/manager'); // ניווט חזרה לדשבורד רק אחרי שהיא אישרה את ההצלחה
+      navigate('/manager'); 
     }
   };
 
@@ -49,7 +41,6 @@ const AddStockM = () => {
       className="p-8 max-w-5xl mx-auto relative min-h-[85vh]"
       dir="rtl"
     >
-      {/* כפתור חזרה מהיר */}
       <button 
         onClick={() => navigate('/manager')}
         className="flex items-center gap-2 text-slate-500 hover:text-indigo-400 transition-all mb-8 font-black text-xs tracking-wider uppercase group"
@@ -59,7 +50,6 @@ const AddStockM = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* טופס ההוספה - ה-Main Card */}
         <div className="lg:col-span-2 bg-[#0d111c]/60 backdrop-blur-xl rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] p-10 border border-slate-800/60 relative overflow-hidden">
           
           {/* אפקט תאורת ניאון אינדיגו זז ברקע */}
@@ -160,7 +150,6 @@ const AddStockM = () => {
           </form>
         </div>
 
-        {/* Side Info Panel - קו נקי ומהודק */}
         <div className="space-y-6 flex flex-col justify-between lg:justify-start">
           <div className="bg-[#0d111c]/40 border border-slate-800/60 p-6.5 rounded-2xl relative overflow-hidden transition-all hover:border-slate-700">
             <ShieldCheck className="text-emerald-500/80 mb-3 animate-pulse" size={24} />

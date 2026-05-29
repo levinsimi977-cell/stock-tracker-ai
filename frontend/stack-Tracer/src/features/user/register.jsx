@@ -21,8 +21,7 @@ const Register = () => {
         navigate('/login');
       }, 2000);
     } catch (err) {
-      const errorMsg = err?.data?.message || err?.data || 'אופס! שגיאה בהרשמה. ודא שהפרטים נכונים ונסה שנית.';
-      setStatusMessage({ text: errorMsg, isError: true });
+     
     }
   };
 

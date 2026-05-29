@@ -75,13 +75,11 @@ public class StockController {
         }
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/addAmountStock") // נתיב פשוט בלי לוכסנים בסוף
+    @PostMapping("/addAmountStock")
     public ResponseEntity<String> addAmountStock(@RequestBody Map<String, Object> payload) {
         try {
-            // שליפת הנתונים מתוך ה-Body ששלחנו מה-React
             Long id = Long.valueOf(payload.get("id").toString());
             int amount = Integer.parseInt(payload.get("amount").toString());
-
             stockService.addAmountStock(amount, id);
             return ResponseEntity.ok("כמות המניה עודכנה בהצלחה!");
         } catch (Exception e) {
@@ -116,10 +114,10 @@ public class StockController {
         Stock stock = stockService.findBySymbol(symbol);
         return stock != null ? ResponseEntity.ok(stock) : ResponseEntity.notFound().build();
     }
-
+    //AIכאן מתבצעה בעזרת חישובים
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/ai/sector-health/{sector}")
-    public ResponseEntity<String> getSectorAnalysis(@PathVariable String sector) { // תוקן מ-Stock ל-String
+    public ResponseEntity<String> getSectorAnalysis(@PathVariable String sector) {
         List<Stock> stocks = stockService.findAllBySector(sector);
         if (stocks.isEmpty()) return ResponseEntity.ok("לא נמצאו מניות בסקטור זה.");
 
@@ -131,6 +129,7 @@ public class StockController {
 
         return ResponseEntity.ok("--- ניתוח סקטור: " + sector + " ---\n" + summary);
     }
+//    AI אמיתי
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/ai/analysis/{id}")
     public ResponseEntity<?> getFullAnalysis(@PathVariable Long id) {
@@ -148,7 +147,7 @@ public class StockController {
         response.put("aiInsight", aiResult);
         return ResponseEntity.ok(response);
     }
-
+    //קבלתהמניות החמות ביותר
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/ai/momentum")
     public ResponseEntity<List<Stock>> getHotStocks() {

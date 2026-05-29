@@ -7,7 +7,6 @@ export const userApi = createApi({
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('token'); 
       if (token) {
-        // שימוש ב-Authorization עם אות גדולה כפי שהסרבר מצפה
         headers.set('Authorization', `Bearer ${token}`);
       }
       return headers;

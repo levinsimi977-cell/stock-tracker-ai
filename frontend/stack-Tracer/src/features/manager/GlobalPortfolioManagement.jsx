@@ -22,7 +22,6 @@ const GlobalPortfolioManagement = () => {
     <AdminPageLayout title="Market Intelligence" subtitle="Live Data & AI Analytics" icon={BarChart3}>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        {/* טבלת מניות */}
         <div className="lg:col-span-3 bg-[#0d111c]/60 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-800/50 overflow-hidden">
           <table className="w-full text-right border-collapse">
             <thead className="bg-slate-900/50 border-b border-slate-800">
@@ -36,7 +35,6 @@ const GlobalPortfolioManagement = () => {
             </thead>
             <tbody className="divide-y divide-slate-800/50">
               {stocks?.map(stock => {
-                // חישוב אחוז שינוי אמיתי על סמך מערך המחירים הקיים מהשרת
                 const prices = stock?.movePrice || [];
                 let changePercent = 0;
                 let isPositive = true;
@@ -85,7 +83,6 @@ const GlobalPortfolioManagement = () => {
           </table>
         </div>
 
-        {/* פאנל AI */}
         <div className="space-y-6">
           <div className="bg-[#0f172a] p-8 rounded-[2rem] border border-indigo-500/10 shadow-2xl relative overflow-hidden">
             <BrainCircuit className="text-indigo-500 mb-6" size={40} />
@@ -125,7 +122,6 @@ if (fullText.includes("קנייה")) {
 } else if (fullText.includes("החזקה")) {
   text = "⚪ החזקה";
 }
-  // זיהוי חכם יותר של תתי מחרוזות או אייקונים מהשרת
   const isPositive = text.includes("קנייה") || text.includes("Buy") || text.includes("📈");
   const isNegative = text.includes("מכירה") || text.includes("Sell") || text.includes("📉");
 

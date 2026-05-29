@@ -9,7 +9,6 @@ const Wallet = () => {
     const [withdraw, { isLoading: isWithdrawLoading }] = useWithdrawMoneyMutation();
     const [amount, setAmount] = useState('');
 
-    // מערכת הודעות ניאון פנימית
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
 
     const isActionLoading = isDepositLoading || isWithdrawLoading;
@@ -30,11 +29,7 @@ const Wallet = () => {
             setAmount('');
             refetch();
         } catch (err) {
-            setAlertConfig({ 
-              isOpen: true, 
-              type: 'error', 
-              message: err?.data?.message || 'הפעולה נכשלה. נא לוודא יתרה מספקת או לבדוק את החיבור לשרת.' 
-            });
+           
         }
     };
 

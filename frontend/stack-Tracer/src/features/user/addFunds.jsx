@@ -11,7 +11,6 @@ const AddFunds = () => {
 
     const navigate = useNavigate();
 
-    // מערכת הודעות ניאון פנימית אחידה
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
 
     const handleDeposit = async () => {
@@ -28,11 +27,7 @@ const AddFunds = () => {
             });
             setTimeout(() => navigate('/dashboard'), 1800);
         } catch (err) {
-            setAlertConfig({
-                isOpen: true,
-                type: 'error',
-                message: err?.data?.message || 'שגיאה בעיבוד ההפקדה. נא לנסות שוב מאוחר יותר.'
-            });
+           
         }
     };
 
@@ -50,11 +45,7 @@ const AddFunds = () => {
             });
             setTimeout(() => navigate('/dashboard'), 1800);
         } catch (err) {
-            setAlertConfig({
-                isOpen: true,
-                type: 'error',
-                message: err?.data?.message || 'הפעולה נדחתה. נא לוודא שיש מספיק הון נזיל בארנק.'
-            });
+           
         }
     };
 
@@ -63,10 +54,8 @@ const AddFunds = () => {
     return (
         <div className="p-8 max-w-md mx-auto min-h-screen bg-[#07080b] text-slate-200 text-right flex flex-col items-center justify-center relative overflow-hidden" dir="rtl">
             
-            {/* אפקט הילת אור עמוקה ברקע הפאנל */}
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-gradient-to-b from-indigo-600/[0.02] to-transparent rounded-full blur-[100px] pointer-events-none" />
 
-            {/* כפתור חזרה מהיר */}
             <button 
                 onClick={() => navigate(-1)} 
                 className="absolute top-8 right-8 flex items-center gap-2 text-slate-500 hover:text-white font-black text-xs transition-colors group cursor-pointer"
@@ -74,13 +63,11 @@ const AddFunds = () => {
                 חזרה <ArrowLeft size={13} className="transition-transform group-hover:translate-x-[2px]" />
             </button>
 
-            {/* קונטיינר הארנק */}
             <motion.div 
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full bg-[#0d111c]/70 backdrop-blur-md p-8 rounded-[2.5rem] shadow-[0_30px_70px_rgba(0,0,0,0.6)] border border-slate-900 relative overflow-hidden"
             >
-                {/* קו זוהר דק עליון */}
                 <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-indigo-500/20 via-purple-500/30 to-indigo-500/20" />
 
                 <div className="flex flex-col items-center mb-6">
@@ -93,7 +80,6 @@ const AddFunds = () => {
                     <p className="text-slate-500 text-[10px] font-black mt-1.5 uppercase tracking-widest">// הפקדה ומשיכה מיידית מחשבון המסחר שלך</p>
                 </div>
 
-                {/* קלט דיגיטלי מלוטש */}
                 <div className="relative group mb-6">
                     <input
                         type="number"
@@ -105,7 +91,6 @@ const AddFunds = () => {
                     <span className="absolute left-5 top-1/2 -translate-y-1/2 font-mono font-black text-slate-600 text-lg group-focus-within:text-indigo-400 transition-colors">$</span>
                 </div>
 
-                {/* לחצני בחירה מהירה */}
                 <div className="grid grid-cols-3 gap-3 mb-8">
                     {[100, 500, 1000].map((value) => (
                         <button
@@ -118,7 +103,6 @@ const AddFunds = () => {
                     ))}
                 </div>
 
-                {/* לחצני פעולה אחידים */}
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         onClick={handleDeposit}
@@ -138,7 +122,6 @@ const AddFunds = () => {
                 </div>
             </motion.div>
 
-            {/* 🌟 חלונית הודעות ניאון מונפשת ומאוחדת */}
             <AnimatePresence>
                 {alertConfig.isOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">

@@ -2,7 +2,6 @@ import React from 'react';
 import { useLazyGetAIAdviceQuery } from './stockOwnershipApi';
 
 const StockOwnership = ({ item, navigate }) => {
-    // לכל מניה יש עכשיו Instance משלה של ה-Hook הזה
 const [triggerAI, result] = useLazyGetAIAdviceQuery();
 const [activeAIStockId, setActiveAIStockId] = React.useState(null);
     return (
@@ -20,13 +19,11 @@ const [activeAIStockId, setActiveAIStockId] = React.useState(null);
                     מחיר קנייה ממוצע: <span className="text-emerald-400 font-bold font-mono">${item.purchasePrice?.toFixed(2)}</span>
                 </p>
 
-                {/* כפתור ה-AI של המניה הזו */}
                 <button
 onClick={() => {
     setActiveAIStockId(item.stock.id);
     triggerAI(item.stock.id)
-        .unwrap()
-        .catch(err => console.error("AI error:", err));
+    
 }}            
    disabled={result.isFetching}
                     className="text-xs text-amber-500 font-black mt-5 block hover:text-amber-400 disabled:opacity-50 transition-colors uppercase tracking-wider"
@@ -36,7 +33,6 @@ onClick={() => {
                 
 
                 
-                {/* הצגת העצה של ה-AI רק אם קיימת למניה הזו */}
               {activeAIStockId === item.stock.id && result.data && (
     <div className="text-sm bg-indigo-500/5 p-4 mt-4 rounded-2xl border border-indigo-500/20 text-indigo-300 italic shadow-inner">
         <span className="font-black block mb-1 text-indigo-400 not-italic">
@@ -47,7 +43,6 @@ onClick={() => {
 )}
             </div>
 
-            {/* כפתורי פעולה */}
             <div className="flex gap-3 w-full md:w-auto">
                 <button
                     onClick={() => navigate(`/trade?symbol=${item.stock.symbol}&type=BUY`)}

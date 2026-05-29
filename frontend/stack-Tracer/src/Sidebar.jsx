@@ -25,7 +25,6 @@ const Sidebar = () => {
     ];
 
     return (
-        // 🔥 תיקון קריטי: z-[9999] כדי לצוף מעל ה-Layout של המנהל, ו-right-0 נעול
         <div className="w-64 bg-[#0f172a]/95 backdrop-blur-xl text-slate-100 h-screen p-6 flex flex-col fixed right-0 top-0 border-l border-slate-800/50 shadow-2xl z-[9999]" dir="rtl">
             {/* לוגו המערכת */}
             <div className="mb-8 text-center border-b border-slate-800/60 pb-6">

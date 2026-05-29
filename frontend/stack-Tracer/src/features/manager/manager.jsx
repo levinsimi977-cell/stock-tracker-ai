@@ -10,7 +10,6 @@ function ManagerPage() {
   const { data: stocks, isLoading, refetch } = useGetAllStockQuery();
   const [search, setSearch] = useState("");
 
-  // 1. אופטימיזציה נשמרה: סינון מניות חכם ב-useMemo
   const filteredStocks = useMemo(() => {
     return stocks?.filter(s => s.symbol.toLowerCase().includes(search.toLowerCase())) || [];
   }, [stocks, search]);
@@ -29,7 +28,6 @@ function ManagerPage() {
     );
   }
 
-  // חישוב נתונים מהירים לכרטיסי המידע (KPIs)
   const totalStocks = stocks?.length || 0;
   const totalShares = stocks?.reduce((acc, s) => acc + (s.availableShares || 0), 0) || 0;
 
@@ -40,7 +38,6 @@ function ManagerPage() {
       className="p-6 lg:p-10 max-w-7xl mx-auto space-y-8" 
       dir="rtl"
     >
-      {/* 👑 הדר יוקרתי ומתוחכם עם אפקט זכוכית כהה */}
       <header className="relative overflow-hidden bg-slate-900/40 backdrop-blur-md rounded-[2rem] p-8 border border-slate-800/60 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-3">
@@ -57,7 +54,6 @@ function ManagerPage() {
         <div className="absolute top-[-20px] left-[-20px] w-48 h-48 bg-indigo-500/5 blur-[80px] rounded-full pointer-events-none"></div>
       </header>
 
-      {/* 📊 שורת סטטיסטיקה מלוטשת (מידע מנהלים מהיר) */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <div className="p-6 bg-[#0f172a]/60 border border-slate-800/40 rounded-2xl flex items-center justify-between shadow-xl">
           <div>
@@ -93,7 +89,6 @@ function ManagerPage() {
           </div>
         </div>
       </section>
-      {/* אחרי ה-section של הסטטיסטיקות, תוסיפי: */}
 <section className="bg-[#0f172a]/60 border border-slate-800/40 rounded-2xl p-6 shadow-xl flex items-center justify-between">
     <div>
         <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">פיזור סקטורים בשוק</p>
@@ -104,7 +99,6 @@ function ManagerPage() {
     </div>
 </section>
 
-      {/* 🔍 שורת חיפוש יוקרתית בהתאמה לקו העיצובי */}
       <div className="relative group">
         <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={20} />
         <input 
@@ -115,7 +109,6 @@ function ManagerPage() {
         />
       </div>
 
-      {/* 📈 תצוגת המניות המוצעות באתר - Dark Luxury קשוח ואחיד */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence>
           {filteredStocks.map((stock) => (
@@ -128,7 +121,6 @@ function ManagerPage() {
               whileHover={{ y: -4, border: "1px solid rgba(99, 102, 241, 0.3)" }}
               className="bg-[#0f172a]/70 border border-slate-800/80 p-6 rounded-2xl shadow-xl transition-all duration-300 relative overflow-hidden group"
             >
-              {/* כותרת הכרטיס ומחיר */}
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-xl font-black text-slate-100 font-mono tracking-tight group-hover:text-indigo-400 transition-colors">
@@ -145,12 +137,10 @@ function ManagerPage() {
                 </div>
               </div>
               
-              {/* גרף המיניאטורי */}
               <div className="h-28 w-full bg-[#06080f]/60 border border-slate-800/40 rounded-xl overflow-hidden mb-4 p-1">
                 <StockMiniChart stock={stock} />
               </div>
 
-              {/* מידע תחתון וכפתור פרטים מנקר עיניים */}
               <div className="flex justify-between items-center text-[11px] font-bold tracking-wide mt-2">
                 <span className="text-slate-500">
                   מלאי זמין: <span className="text-slate-300 font-mono">{stock.availableShares}</span>
@@ -168,7 +158,6 @@ function ManagerPage() {
         </AnimatePresence>
       </section>
 
-      {/* הודעת "אין תוצאות" תואמת עיצוב */}
       {filteredStocks.length === 0 && (
         <div className="p-20 text-center text-slate-500 font-bold border border-dashed border-slate-800 rounded-3xl bg-[#0f172a]/20">
           לא נמצאו מניות העונות לסימול המבוקש.

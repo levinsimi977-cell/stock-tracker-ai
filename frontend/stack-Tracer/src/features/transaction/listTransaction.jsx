@@ -16,7 +16,6 @@ const ListTransaction = () => {
 
     return (
         <div className="p-8 bg-[#07080b] min-h-screen rtl text-right">
-            {/* HEADER */}
             <header className="max-w-5xl mx-auto mb-10">
                 <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                     <ArrowLeftRight className="text-amber-500" /> יומן עסקאות
@@ -24,7 +23,6 @@ const ListTransaction = () => {
                 <p className="text-slate-500 font-medium mt-2 text-sm">מעקב מלא אחרי היסטוריית המסחר שלך</p>
             </header>
 
-            {/* TABLE CONTAINER */}
             <div className="max-w-5xl mx-auto bg-[#0d0e12] border border-slate-800/40 rounded-2xl overflow-hidden shadow-[0_15px_50px_rgba(0,0,0,0.4)]">
                 <div className="overflow-x-auto">
                     <table className="w-full text-right border-collapse">

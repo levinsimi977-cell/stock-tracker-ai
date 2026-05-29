@@ -14,7 +14,6 @@ const TransactionForm = ({ stock: propStock }) => {
 
     const [quantity, setQuantity] = useState(1);
     
-    // סטייט לניהול הפופ-אפים היוקרתיים
     const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'success', message: '' });
     
     const { data: fetchedStock, isLoading: isStockLoading } = useGetStockBySymbolQuery(
@@ -45,7 +44,6 @@ const TransactionForm = ({ stock: propStock }) => {
                 type: type 
             }).unwrap();
             
-            // הקפצת הודעת הצלחה מפוצצת
             setModalConfig({
                 isOpen: true,
                 type: 'success',
@@ -54,19 +52,14 @@ const TransactionForm = ({ stock: propStock }) => {
                     : `המכירה בוצעה! מימשת בהצלחה ${parsedAmount} יחידות של ${stock.symbol}.`
             });
         } catch (err) {
-            // הקפצת הודעת שגיאה באדום ניאון
-            setModalConfig({
-                isOpen: true,
-                type: 'error',
-                message: err.data || 'העסקה נדחתה. בדוק יתרה בארנק או זמינות מלאי במערכת.'
-            });
+           
         }
     };
 
     const handleCloseModal = () => {
         setModalConfig({ ...modalConfig, isOpen: false });
         if (modalConfig.type === 'success') {
-            navigate('/portfolio'); // העברה לתיק רק אחרי הצלחה וסגירת המודאל
+            navigate('/portfolio'); 
         }
     };
 
@@ -87,7 +80,6 @@ const TransactionForm = ({ stock: propStock }) => {
         <div className="relative min-h-[80vh] flex items-center justify-center px-4">
             <div className="w-full max-w-md p-8 bg-[#0d0e12] border border-slate-800/60 shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-[2.5rem] text-right text-slate-200 relative overflow-hidden">
                 
-                {/* אפקט עיצובי ברקע כסגנון Cyberpunk */}
                 <div className={`absolute top-0 right-0 w-32 h-32 blur-[80px] opacity-10 rounded-full ${typeFromUrl === 'BUY' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
 
                 <header className="mb-8">
@@ -143,7 +135,6 @@ const TransactionForm = ({ stock: propStock }) => {
                 </div>
             </div>
 
-            {/* 🌟 המודאל המטורף: מחליף את ה-Alert עם אנימציית פופ-אין פסיכית */}
             <AnimatePresence>
                 {modalConfig.isOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">

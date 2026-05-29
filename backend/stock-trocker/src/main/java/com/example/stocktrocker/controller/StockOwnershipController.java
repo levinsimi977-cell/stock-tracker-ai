@@ -24,11 +24,10 @@ public class StockOwnershipController {
 
     @GetMapping("/advice/{stockId}")
     public ResponseEntity<?> getAIAdvice(@PathVariable Long stockId) {
-        // שליית המשתמש המחובר מה-Token
         String email = (String) org.springframework.security.core.context.SecurityContextHolder
                 .getContext().getAuthentication().getPrincipal();
         User user = userService.getUserByEmail(email);
-
+        //ניתוח ml
         StockOwnership ownership = ownershipRepo.findByUserIdAndStockId(user.getId(), stockId);
         if (ownership == null) return ResponseEntity.notFound().build();
 
@@ -42,7 +41,7 @@ public class StockOwnershipController {
         StockOwnership ownership = ownershipRepo.findByUserIdAndStockId(userId, stockId);
         return ownershipService.calculateCurrentPAndL(ownership);
     }
-
+    //כלל המניות שבבעלות המשתמש.
     @GetMapping("/my-portfolio")
     public ResponseEntity<?> getMyPortfolio() {
         try {

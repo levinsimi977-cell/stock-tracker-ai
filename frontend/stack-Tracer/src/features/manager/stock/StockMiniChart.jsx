@@ -11,14 +11,12 @@ const StockMiniChart = ({ stock }) => {
   const firstPrice = prices[0];
   const lastPrice = prices[prices.length - 1];
 
-  // לוגיקת צבעים משולשת:
-  let strokeColor = "#94a3b8"; // ברירת מחדל: אפור (למצב סטטי)
+  let strokeColor = "#94a3b8"; 
   if (lastPrice > firstPrice) {
-    strokeColor = "#10b981"; // ירוק: עלייה
+    strokeColor = "#10b981";
   } else if (lastPrice < firstPrice) {
-    strokeColor = "#f43f5e"; // אדום: ירידה
+    strokeColor = "#f43f5e"; 
   }
-  // אם הם שווים - נשאר אפור (שזה ה"שחור" המעודן של מערכות פיננסיות)
 
   const gradientId = `colorPrice-${stock.id}`;
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-// פלטת צבעי סייבר עמוקה ויוקרתית שמתאימה לקו האחיד של האתר
 const COLORS = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#a855f7'];
 
 const SectorPieChart = ({ stocks }) => {
@@ -18,7 +17,7 @@ const SectorPieChart = ({ stocks }) => {
   }, []);
 
   return (
-    <div className="h-64 w-full" dir="ltr"> {/* שמירה על כיוון ltr לצורך תצוגת הגרף התקנית */}
+    <div className="h-64 w-full" dir="ltr"> 
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -38,7 +37,6 @@ const SectorPieChart = ({ stocks }) => {
             ))}
           </Pie>
           
-          {/* טולטיפ משודרג לחלוטין - קו Cyber נקי */}
           <Tooltip 
             contentStyle={{ 
               backgroundColor: '#141a29', 
@@ -54,8 +52,7 @@ const SectorPieChart = ({ stocks }) => {
             itemStyle={{ color: '#cbd5e1' }}
           />
           
-          {/* מקרא נקי עם עיצוב מותאם */}
-          <Legend 
+=          <Legend 
             verticalAlign="bottom" 
             height={36}
             iconType="circle"

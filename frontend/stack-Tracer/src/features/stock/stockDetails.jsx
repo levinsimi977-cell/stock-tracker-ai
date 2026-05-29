@@ -20,7 +20,6 @@ const StockDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [executeTransaction, { isLoading: isBuying }] = useExecuteTransactionMutation();
   
-  // מערכת הודעות פנימית בקו היוקרתי של האתר
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
 
   const { data: stock, isLoading: isStockLoading } = useGetStockBySymbolQuery(symbol);
@@ -82,21 +81,15 @@ const advice = expertAdvice?.advice || {};
       });
       setTimeout(() => navigate('/portfolio'), 1800);
     } catch (error) {
-      setAlertConfig({
-        isOpen: true,
-        type: 'error',
-        message: error.data?.message || 'פקודת הרכישה נדחתה על ידי השרת. ודא שיש לך מספיק נזילות בארנק.'
-      });
+      
     }
   };
 
   return (
     <div className="p-8 max-w-5xl mx-auto bg-[#07080b] min-h-screen text-slate-200 pb-24 relative overflow-hidden" dir="rtl">
       
-      {/* תאורת רקע פסיכדלית של פאנל מסחר */}
       <div className="absolute top-0 right-1/3 w-[500px] h-[250px] bg-gradient-to-b from-indigo-500/[0.03] to-transparent rounded-full blur-[120px] pointer-events-none" />
 
-      {/* כפתור חזרה מעוצב */}
       <button 
         onClick={() => navigate(-1)} 
         className="mb-8 flex items-center gap-2 text-slate-500 hover:text-white font-black text-xs transition-colors group cursor-pointer"
@@ -104,7 +97,6 @@ const advice = expertAdvice?.advice || {};
         <ArrowLeft size={14} className="transition-transform group-hover:translate-x-[3px]" /> חזרה לבורסה
       </button>
 
-      {/* HEADER */}
       <motion.div 
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -121,7 +113,6 @@ const advice = expertAdvice?.advice || {};
         </div>
       </motion.div>
 
-      {/* STOCK INFO GRID */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -144,7 +135,6 @@ const advice = expertAdvice?.advice || {};
         ))}
       </motion.div>
 
-      {/* AI SECTION ANALYSIS */}
       <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
         <Cpu size={14} className="text-indigo-400 animate-pulse" /> מערכות ניתוח פרודקטיביות (AI Modules)
       </h3>
@@ -155,7 +145,6 @@ const advice = expertAdvice?.advice || {};
         transition={{ delay: 0.2 }}
         className="grid md:grid-cols-3 gap-6 mb-10"
       >
-        {/* INSIGHT */}
         <div className="bg-[#0d111c]/60 p-6 rounded-2xl border border-slate-900 shadow-lg relative overflow-hidden group">
           <div className="absolute top-0 inset-x-0 h-[2px] bg-indigo-500/30 group-hover:bg-indigo-400 transition-colors" />
           <h2 className="font-black text-indigo-400 text-sm flex items-center gap-2 mb-3">🔍 תובנות בינה מלאכותית</h2>
@@ -166,7 +155,6 @@ const advice = expertAdvice?.advice || {};
           )}
         </div>
 
-        {/* FORECAST */}
         <div className="bg-[#0d111c]/60 p-6 rounded-2xl border border-slate-900 shadow-lg relative overflow-hidden group">
           <div className="absolute top-0 inset-x-0 h-[2px] bg-amber-500/30 group-hover:bg-amber-400 transition-colors" />
           <h2 className="font-black text-amber-400 text-sm flex items-center gap-2 mb-3">📈 תחזית שווי עתידי</h2>
@@ -210,7 +198,6 @@ const advice = expertAdvice?.advice || {};
         </div>
       </motion.section>
 
-      {/* BUY BUTTON */}
       <motion.button
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
@@ -221,7 +208,6 @@ const advice = expertAdvice?.advice || {};
         {stock.availableShares > 0 ? `בצע פקודת רכישה עבור ${stock.symbol} ←` : 'המלאי אזל לחלוטין (Out of Stock)'}
       </motion.button>
 
-      {/* MODAL רכישה מונפש ויוקרתי */}
       <AnimatePresence>
         {showTradeModal && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={() => setShowTradeModal(false)}>
@@ -255,7 +241,6 @@ const advice = expertAdvice?.advice || {};
                 />
               </div>
 
-              {/* סיכום עסקה משוער */}
               <div className="flex justify-between items-center mt-5 px-1 text-xs font-bold text-slate-500">
                 <span>סה"כ משוער לתשלום:</span>
                 <span className="font-mono text-white text-sm">${(quantity * stock.currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -276,7 +261,6 @@ const advice = expertAdvice?.advice || {};
         )}
       </AnimatePresence>
 
-      {/* 🌟 מודאל הודעות מערכת המאוחד */}
       <AnimatePresence>
         {alertConfig.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">

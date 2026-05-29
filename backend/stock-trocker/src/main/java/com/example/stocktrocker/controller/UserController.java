@@ -116,7 +116,6 @@ public class UserController {
             );
 
         } catch (IllegalArgumentException e) {
-            // תופס שגיאות כמו "אין מספיק כסף בחשבון"
             return ResponseEntity.badRequest().body(
                     Map.of("message", e.getMessage())
             );

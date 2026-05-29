@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '../../app/apiConfig';
-import { stockOwnershipApi } from '../stockOwnership/stockOwnershipApi'; // תוודאי שהנתיב לקובץ מדויק אצלך
-import { userApi } from '../user/userApi'; // תוודאי שהנתיב לקובץ מדויק אצלך
+import { stockOwnershipApi } from '../stockOwnership/stockOwnershipApi'; 
+import { userApi } from '../user/userApi'; 
 
 export const transactionApi = createApi({
   reducerPath: 'transactionApi',
@@ -24,15 +24,12 @@ export const transactionApi = createApi({
         responseHandler: (response) => response.text(),
       }),
       invalidatesTags: ['Transaction'],
-      // 🔥 התיקון המנצח: מזריקים פקודת רענון ישירות ל-Cache של התיק והארנק!
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-          // ברגע שהעסקה מצליחה בשרת, אנחנו מכריחים את שני ה-APIs האחרים להתרענן מיד
           dispatch(stockOwnershipApi.util.invalidateTags(['Ownership']));
           dispatch(userApi.util.invalidateTags(['User']));
         } catch (err) {
-          // שגיאה תטופל ישירות בקומפוננטה
         }
       }
     }),

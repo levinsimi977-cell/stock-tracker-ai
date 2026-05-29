@@ -10,11 +10,9 @@ import { motion } from 'framer-motion';
 const StockDashboard = () => {
     const navigate = useNavigate();
     
-    // בדיקת סטייט התחברות
     const auth = useSelector((state) => state.auth);
     const token = auth?.token || localStorage.getItem('token');
 
-    // שליפת נתונים דינמית מהשרת
     const { data: balanceData } = useGetBalanceQuery(undefined, { skip: !token });
     const { data: stocks, isLoading } = useGetAllStockQuery();
 
@@ -24,7 +22,6 @@ const StockDashboard = () => {
         stock?.symbol?.toLowerCase().includes(search.toLowerCase())
     );
 
-    // אנימציות קונטיינר
     const containerVariants = {
         hidden: { opacity: 0 },
         show: {
@@ -50,11 +47,9 @@ const StockDashboard = () => {
     return (
         <div className="p-8 bg-[#07080b] min-h-screen relative overflow-hidden pb-24" dir="rtl">
             
-            {/* אפקטי תאורת אווירה פסיכיים ויוקרתיים ברקע האתר */}
             <div className="absolute top-0 left-1/4 w-[600px] h-[300px] bg-gradient-to-b from-indigo-500/[0.03] to-transparent rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute bottom-1/4 right-10 w-[400px] h-[400px] bg-gradient-to-tr from-purple-500/[0.02] to-transparent rounded-full blur-[120px] pointer-events-none" />
 
-            {/* HEADER */}
             <motion.header 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -68,7 +63,6 @@ const StockDashboard = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-                    {/* שורת חיפוש מלוטשת */}
                     <div className="relative w-full sm:w-72 lg:w-80 group">
                         <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-indigo-400" size={16} />
                         <input
@@ -80,7 +74,6 @@ const StockDashboard = () => {
                         />
                     </div>
 
-                    {/* כפתורי אורחים בעיצוב הייטק קיצוני */}
                     {!token && (
                         <div className="flex items-center gap-3 w-full sm:w-auto">
                             <button 
@@ -100,7 +93,6 @@ const StockDashboard = () => {
                 </div>
             </motion.header>
 
-            {/* TOP CARDS - מוצג רק למשקיעים רשומים */}
             {token && (
                 <motion.div 
                     initial={{ opacity: 0, y: 10 }}
@@ -108,7 +100,6 @@ const StockDashboard = () => {
                     transition={{ delay: 0.1 }}
                     className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 relative z-10"
                 >
-                    {/* כרטיס ארנק פיננסי */}
                     <div className="lg:col-span-2 bg-[#0d111c]/60 border border-slate-900 rounded-2xl p-8 text-white shadow-[0_30px_70px_rgba(0,0,0,0.5)] relative overflow-hidden group">
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-indigo-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -130,7 +121,6 @@ const StockDashboard = () => {
                         </div>
                     </div>
 
-                    {/* כרטיס המניה המובילה היומית */}
                     <div className="bg-[#0d111c]/60 border border-slate-900 rounded-2xl p-8 shadow-[0_30px_70px_rgba(0,0,0,0.5)] flex flex-col justify-between group relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div>
@@ -162,7 +152,6 @@ const StockDashboard = () => {
                 </motion.div>
             )}
 
-            {/* כותרת משנית לרשימת המניות */}
             <div className="flex items-center justify-between mb-6 relative z-10 px-1">
                 <h3 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
                     <TrendingUp size={16} className="text-indigo-400" /> נכסים דיגיטליים למסחר בזמן אמת
@@ -172,7 +161,6 @@ const StockDashboard = () => {
                 </span>
             </div>
 
-            {/* GRID המניות המונפש */}
             {filteredStocks && filteredStocks.length > 0 ? (
                 <motion.div 
                     variants={containerVariants}

@@ -16,40 +16,33 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // שולחים את נתוני ההתחברות ומחכים לתשובה מהשרת
             const response = await login({ email, password }).unwrap();
             const user = response.user;
     
-            // קביעת תפקיד המשתמש בצורה נקייה
-            const role = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
+            const role = (user.role === 'ADMIN') ? 'ADMIN' : 'USER';
     
-            // שמירה מינימלית וממוקדת ב-LocalStorage ללא כפילויות
             localStorage.setItem('token', response.token);
             localStorage.setItem('role', role);
             localStorage.setItem('username', user.username);
     
-            // עדכון ה-Redux Store שמשפיע מיד על ה-Sidebar ודף הבית
             dispatch(setCredentials({
                 token: response.token,
                 role: role,
                 username: user.username
             }));
     
-            // ניווט מותאם תפקיד
             if (role === 'ADMIN') {
                 navigate('/manager');
             } else {
                 navigate('/stocks');
             }
         } catch (err) {
-            console.error('Failed to login:', err);
         }
     };
 
     return (
         <div className="w-full min-h-screen flex items-center justify-center bg-[#07080b] px-6 py-12 relative overflow-hidden" dir="rtl">
             
-            {/* אפקטי תאורת אווירה דיגיטליים ויוקרתיים ברקע (אינדיגו וסגול קריסטל) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/[0.02] rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute -top-20 -left-20 w-[350px] h-[350px] bg-purple-500/[0.02] rounded-full blur-[100px] pointer-events-none" />
 
@@ -104,7 +97,6 @@ const Login = () => {
                         />
                     </div>
 
-                    {/* שדה סיסמה */}
                     <div className="space-y-2">
                         <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest pr-1 flex items-center gap-1.5">
                             <Lock size={12} className="text-slate-500" /> מפתח סיסמה מאובטח
